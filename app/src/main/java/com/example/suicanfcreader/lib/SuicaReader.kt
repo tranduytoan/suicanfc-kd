@@ -48,11 +48,11 @@ class SuicaReader {
         day = dateBits and 0x01f
 
         kind = when {
-            isCharge(procId) -> "チャージ"
-            isShopping(procId) -> "物販"
-            isBus(procId) -> "バス"
+            isCharge(procId) -> "Nạp tiền"
+            isShopping(procId) -> "Mua sắm"
+            isBus(procId) -> "Xe buýt"
             unsigned(res[off + 6]) < 0x80 -> "JR"
-            else -> "公営/私鉄"
+            else -> "Tàu điện/Tư nhân"
         }
 
         inLine = intAt(res, off, 6)
@@ -64,7 +64,7 @@ class SuicaReader {
         remain = intAt(res, off, 11, 10)
         seqNo = intAt(res, off, 12, 13, 14)
         regionCode = unsigned(res[off + 15])
-        device = deviceList[termId] ?: "端末不明"
+        device = deviceList[termId] ?: "Thiết bị không xác định"
         action = actionList[procId] ?: kind
     }
 
@@ -102,20 +102,20 @@ class SuicaReader {
 
     companion object {
         private val deviceList = mapOf(
-            3 to "精算機", 4 to "携帯型端末", 5 to "車載端末", 7 to "券売機", 8 to "券売機",
-            9 to "入金機", 18 to "券売機", 20 to "券売機等", 21 to "券売機等", 22 to "改札機",
-            23 to "簡易改札機", 24 to "窓口端末", 25 to "窓口端末", 26 to "改札端末", 27 to "携帯電話",
-            28 to "乗継精算機", 29 to "連絡改札機", 31 to "簡易入金機", 70 to "VIEW ALTTE",
-            72 to "VIEW ALTTE", 199 to "物販端末", 200 to "自販機"
+            3 to "Máy điều chỉnh cước", 4 to "Thiết bị cầm tay", 5 to "Thiết bị trên xe", 7 to "Máy bán vé", 8 to "Máy bán vé",
+            9 to "Máy nạp tiền", 18 to "Máy bán vé", 20 to "Máy bán vé, v.v.", 21 to "Máy bán vé, v.v.", 22 to "Cổng soát vé",
+            23 to "Cổng soát vé đơn giản", 24 to "Quầy giao dịch", 25 to "Quầy giao dịch", 26 to "Thiết bị soát vé", 27 to "Điện thoại di động",
+            28 to "Máy chuyển tuyến", 29 to "Cổng chuyển tuyến", 31 to "Máy nạp tiền đơn giản", 70 to "VIEW ALTTE",
+            72 to "VIEW ALTTE", 199 to "POS", 200 to "Máy bán hàng tự động"
         )
 
         private val actionList = mapOf(
-            1 to "運賃支払", 2 to "チャージ", 3 to "券購入", 4 to "精算", 5 to "入場精算",
-            6 to "窓口処理", 7 to "新規発行", 8 to "控除", 13 to "バス", 15 to "バス", 17 to "再発行",
-            19 to "支払", 20 to "入場オートチャージ", 21 to "出場オートチャージ", 31 to "バスチャージ",
-            35 to "バス券購入", 70 to "物販", 72 to "特典チャージ", 73 to "レジ入金", 74 to "物販取消",
-            75 to "入場物販", 132 to "他社精算", 133 to "他社入場精算", 198 to "現金併用物販",
-            203 to "入場現金併用物販"
+            1 to "Thanh toán cước", 2 to "Nạp tiền", 3 to "Mua vé", 4 to "Điều chỉnh cước", 5 to "Vào cổng điều chỉnh",
+            6 to "Xử lý tại quầy", 7 to "Phát hành mới", 8 to "Khấu trừ", 13 to "Xe buýt", 15 to "Xe buýt", 17 to "Cấp lại thẻ",
+            19 to "Thanh toán", 20 to "Tự động nạp khi vào", 21 to "Tự động nạp khi ra", 31 to "Nạp trên xe buýt",
+            35 to "Mua vé xe buýt", 70 to "Mua sắm", 72 to "Nạp điểm thưởng", 73 to "Nạp tại quầy thu ngân", 74 to "Hủy mua hàng",
+            75 to "Mua sắm trong ga", 132 to "Thanh toán hãng khác", 133 to "Vào cổng thanh toán hãng khác", 198 to "Mua hàng kèm tiền mặt",
+            203 to "Mua hàng trong ga kèm tiền mặt"
         )
 
         @JvmStatic
