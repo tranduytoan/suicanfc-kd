@@ -57,8 +57,8 @@ class BalanceWidgetProvider : AppWidgetProvider() {
         val lines = latestByCard.entries.take(3).joinToString("\n") { (cardId, record) ->
             val title = aliases[cardId] ?: cardId.maskForDisplay()
             "$title  ${record?.optString("balance").formatYen()}"
-        }.ifBlank { "交通系ICカードをかざしてください" }
-        val details = "支出 ${totalSpending.formatYen()} / 移動 ${movementCount}回 / 履歴 ${cards.size}件"
+        }.ifBlank { "Vui lòng chạm thẻ IC giao thông" }
+        val details = "Chi tiêu ${totalSpending.formatYen()} / Di chuyển ${movementCount} lượt / Lịch sử ${cards.size} mục"
         val imageUri = prefs.getString("widget_background_image_uri", null)
         val image = imageUri?.let { createWidgetBitmap(context, it, backgroundColor, appTitle, lines, details) }
 

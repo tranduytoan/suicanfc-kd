@@ -272,7 +272,7 @@ class TopScreenViewModel(
 
     fun handleNfcIntent(intent: Intent?, context: Context) {
         if (_demoMode.value == true) {
-            _nfcData.value = "デモモード中はNFC読み取りを行いません"
+            _nfcData.value = "Không quét NFC khi đang ở chế độ Demo"
             _isDataRefreshed.value = true
             return
         }
@@ -282,7 +282,7 @@ class TopScreenViewModel(
         @Suppress("DEPRECATION")
         val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
         if (tag.id?.size != FELICA_ID_LENGTH || NfcF.get(tag) == null) {
-            _nfcData.value = "交通系ICカードとして読み取れませんでした"
+            _nfcData.value = "Không thể đọc như thẻ IC giao thông"
             _isDataRefreshed.value = true
             return
         }
@@ -626,7 +626,7 @@ class TopScreenViewModel(
 
     fun exportSelectedNotionMarkdown(): String {
         val rows = filterHistory(activeHistory(), _selectedCardId.value, _searchQuery.value.orEmpty())
-        val header = "| 日付 | 差額 | 残高 | タイトル | 場所 | メモ | タグ |\n|---|---:|---:|---|---|---|---|"
+        val header = "| Ngày | Chênh lệch | Số dư | Tiêu đề | Địa điểm | Ghi chú | Thẻ tag |\n|---|---:|---:|---|---|---|---|"
         val body = rows.joinToString("\n") { card ->
             val place = listOf(card.inStation, card.outStation).filterNot { it.isNullOrBlank() }.joinToString(" -> ")
             "| ${card.date.orEmpty()} | ${card.amount.orEmpty()} | ${card.balance.orEmpty()} | ${(card.action ?: card.kind).orEmpty()} | $place | ${card.memo.orEmpty()} | ${card.tags.orEmpty()} |"
@@ -655,13 +655,13 @@ class TopScreenViewModel(
                     val amount = card.amount?.toIntOrNull() ?: 0
                     if (amount < 0) -amount else 0
                 }
-                "$month  支出 ${monthSpending}円 / 利用 ${records.size}件"
+                "$month  Chi tiêu ${monthSpending}¥ / Sử dụng ${records.size} lượt"
             }
         return buildString {
-            appendLine("総支出: ${spending}円")
-            appendLine("総チャージ: ${charges}円")
-            appendLine("利用回数: ${rows.size}件")
-            appendLine("移動回数: ${movements}回")
+            appendLine("Tổng chi tiêu: ${spending}¥")
+            appendLine("Tổng nạp tiền: ${charges}¥")
+            appendLine("Số lượt sử dụng: ${rows.size} lượt")
+            appendLine("Số lượt di chuyển: ${movements} lượt")
             if (byMonth.isNotBlank()) {
                 appendLine()
                 appendLine(byMonth)
@@ -864,11 +864,11 @@ class TopScreenViewModel(
         withContext(Dispatchers.IO) {
             val id = tag.id
             if (id.size != FELICA_ID_LENGTH) {
-                return@withContext ReadResult("", emptyList(), "交通系ICカードとして読み取れませんでした")
+                return@withContext ReadResult("", emptyList(), "Không thể đọc như thẻ IC giao thông")
             }
             val cardId = id.toHexString()
             val felica = NfcF.get(tag)
-                ?: return@withContext ReadResult(cardId, emptyList(), "交通系ICカードとして読み取れませんでした")
+                ?: return@withContext ReadResult(cardId, emptyList(), "Không thể đọc như thẻ IC giao thông")
             try {
                 felica.connect()
                 val readChunks = readHistoryChunks(felica, id, context, cardId)
@@ -897,7 +897,7 @@ class TopScreenViewModel(
                 ReadResult(
                     cardId = cardId,
                     cards = emptyList(),
-                    rawText = "NFCタグの読み取りに失敗しました"
+                    rawText = "Đọc thẻ NFC thất bại"
                 )
             } finally {
                 runCatching { felica.close() }
@@ -992,7 +992,7 @@ class TopScreenViewModel(
         cards: List<Card>,
         availableRecords: MutableList<GatePassageRecord>
     ): List<Card> = cards.map { card ->
-        if (card.kind != "JR" && card.kind != "公営/私鉄") return@map card
+        if (card.kind != "JR" && card.kind != "公営/私鉄" && card.kind != "Tàu điện/Tư nhân") return@map card
         val codes = SuicaReader.parseGatePassageStationCodes(card.internalCode) ?: return@map card
         val date = card.date ?: return@map card
         card.apply {
@@ -1040,23 +1040,23 @@ class TopScreenViewModel(
 
     private fun buildRawText(cardId: String, cards: List<Card>, rawResponses: List<ByteArray>): String {
         val sb = StringBuilder()
-        sb.appendLine("カードID: ${cardId.maskForDisplay()}")
-        sb.appendLine("読み取り件数: ${cards.size}件")
+        sb.appendLine("Mã thẻ: ${cardId.maskForDisplay()}")
+        sb.appendLine("Số mục đã đọc: ${cards.size} mục")
         cards.forEachIndexed { index, card ->
             sb.appendLine("=== %02d ===".format(index + 1))
-            sb.appendLine("端末種別: ${card.device.orEmpty()}")
-            sb.appendLine("処理: ${card.action ?: card.kind ?: ""}")
-            sb.appendLine("日付: ${card.date.orEmpty()}")
+            sb.appendLine("Loại thiết bị: ${card.device.orEmpty()}")
+            sb.appendLine("Thao tác: ${card.action ?: card.kind ?: ""}")
+            sb.appendLine("Ngày: ${card.date.orEmpty()}")
             val inPlace = listOf(card.inCompany, card.inLine, card.inStation).readableJoin().takeIf { it != "-" }
             val outPlace = listOf(card.outCompany, card.outLine, card.outStation).readableJoin().takeIf { it != "-" }
             if (inPlace != null || outPlace != null) {
-                inPlace?.let { sb.appendLine("入場: $it") }
-                outPlace?.let { sb.appendLine("出場: $it") }
+                inPlace?.let { sb.appendLine("Vào: $it") }
+                outPlace?.let { sb.appendLine("Ra: $it") }
             } else {
-                sb.appendLine("種別: ${card.activityLabel()}")
+                sb.appendLine("Phân loại: ${card.activityLabel()}")
             }
-            sb.appendLine("差額: ${card.amount.orEmpty()}")
-            sb.appendLine("残高: ${card.balance.orEmpty()}")
+            sb.appendLine("Chênh lệch: ${card.amount.orEmpty()}")
+            sb.appendLine("Số dư: ${card.balance.orEmpty()}")
             sb.appendLine()
         }
         sb.appendLine("BIN:")
@@ -1381,8 +1381,8 @@ class TopScreenViewModel(
             number = "9003",
             amount = "-240",
             kind = "JR",
-            device = "改札機",
-            action = "運賃支払",
+            device = "Cổng soát vé",
+            action = "Thanh toán cước",
             inCompany = "JR西日本",
             inLine = "大阪環状線",
             inStation = "大阪",
@@ -1396,9 +1396,9 @@ class TopScreenViewModel(
             date = "2026/08/08",
             number = "9002",
             amount = "1000",
-            kind = "チャージ",
-            device = "券売機",
-            action = "チャージ",
+            kind = "Nạp tiền",
+            device = "Máy bán vé",
+            action = "Nạp tiền",
             inCompany = "JR西日本",
             inLine = "大阪環状線",
             inStation = "大阪",
@@ -1409,9 +1409,9 @@ class TopScreenViewModel(
             date = "2026/08/07",
             number = "8101",
             amount = "-190",
-            kind = "公営/私鉄",
-            device = "改札機",
-            action = "運賃支払",
+            kind = "Tàu điện/Tư nhân",
+            device = "Cổng soát vé",
+            action = "Thanh toán cước",
             inCompany = "Osaka Metro",
             inLine = "谷町線",
             inStation = "野江内代",
@@ -1426,8 +1426,8 @@ class TopScreenViewModel(
             number = "7201",
             amount = "-178",
             kind = "JR",
-            device = "改札機",
-            action = "運賃支払",
+            device = "Cổng soát vé",
+            action = "Thanh toán cước",
             inCompany = "JR東日本",
             inLine = "中央線",
             inStation = "東京",
@@ -1440,7 +1440,7 @@ class TopScreenViewModel(
 
     private fun String.displayTitle(records: List<Card>): String {
         return if (this == LEGACY_CARD_ID) {
-            "保存済みカード"
+            "Thẻ đã lưu"
         } else {
             "${records.inferTransitBrand()} ${maskForDisplay()}"
         }
@@ -1451,11 +1451,11 @@ class TopScreenViewModel(
             listOf(card.inCompany, card.outCompany, card.inLine, card.outLine)
         }.joinToString(" ")
         return when {
-            "JR西日本" in text || "Osaka Metro" in text -> "ICOCA/PiTaPa系"
-            "JR東日本" in text -> "Suica/PASMO系"
-            "JR東海" in text -> "TOICA/manaca系"
-            "JR九州" in text -> "SUGOCA/nimoca系"
-            else -> "交通系IC"
+            "JR西日本" in text || "Osaka Metro" in text -> "Dòng ICOCA/PiTaPa"
+            "JR東日本" in text -> "Dòng Suica/PASMO"
+            "JR東海" in text -> "Dòng TOICA/manaca"
+            "JR九州" in text -> "Dòng SUGOCA/nimoca"
+            else -> "Thẻ IC giao thông"
         }
     }
 
@@ -1480,10 +1480,10 @@ class TopScreenViewModel(
     private fun Card.activityLabel(): String {
         val text = listOf(action, kind, device).joinToString(" ")
         return when {
-            "チャージ" in text || (amount?.toIntOrNull() ?: 0) > 0 -> "チャージ"
-            "物販" in text -> "物販"
-            "バス" in text -> "バス"
-            else -> "利用"
+            "チャージ" in text || "Nạp tiền" in text || (amount?.toIntOrNull() ?: 0) > 0 -> "Nạp tiền"
+            "物販" in text || "Mua sắm" in text -> "Mua sắm"
+            "バス" in text || "Xe buýt" in text -> "Xe buýt"
+            else -> "Sử dụng"
         }
     }
 
