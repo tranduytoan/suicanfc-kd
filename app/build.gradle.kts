@@ -12,8 +12,14 @@ val verCode = 136
 val verId = "1.7.4"
 val signingProperties = Properties().apply {
     val signingFile = file("keystore.properties")
-    require(signingFile.exists()) { "Missing app/keystore.properties for release signing" }
-    signingFile.inputStream().use(::load)
+    if (signingFile.exists()) {
+        signingFile.inputStream().use(::load)
+    } else {
+        System.getenv("KEYSTORE_FILE")?.let { setProperty("storeFile", it) }
+        System.getenv("KEYSTORE_PASSWORD")?.let { setProperty("storePassword", it) }
+        System.getenv("KEY_ALIAS")?.let { setProperty("keyAlias", it) }
+        System.getenv("KEY_PASSWORD")?.let { setProperty("keyPassword", it) }
+    }
 }
 
 android {
@@ -35,10 +41,13 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(signingProperties.getProperty("storeFile"))
-            storePassword = signingProperties.getProperty("storePassword")
-            keyAlias = signingProperties.getProperty("keyAlias")
-            keyPassword = signingProperties.getProperty("keyPassword")
+            val storeFilePath = signingProperties.getProperty("storeFile")
+            if (!storeFilePath.isNullOrBlank() && file(storeFilePath).exists()) {
+                storeFile = file(storeFilePath)
+                storePassword = signingProperties.getProperty("storePassword")
+                keyAlias = signingProperties.getProperty("keyAlias")
+                keyPassword = signingProperties.getProperty("keyPassword")
+            }
         }
     }
 
@@ -48,7 +57,10 @@ android {
             // R8 remains enabled. Resource shrinking is disabled because it is not
             // reliable on the target Windows build environment.
             isShrinkResources = false
-            signingConfig = signingConfigs.getByName("release")
+            val releaseConfig = signingConfigs.getByName("release")
+            if (releaseConfig.storeFile != null && releaseConfig.storeFile!!.exists()) {
+                signingConfig = releaseConfig
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
