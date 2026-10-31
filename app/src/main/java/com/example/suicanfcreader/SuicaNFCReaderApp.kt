@@ -232,7 +232,7 @@ private fun MoreMenu(
         onDismissRequest = { expanded = false }
     ) {
         DropdownMenuItem(
-            text = { Text("設定") },
+            text = { Text("Cài đặt") },
             onClick = {
                 onOpenSettings()
                 expanded = false
@@ -255,21 +255,21 @@ private fun AppNavigationBar(
             selected = currentRoute == Screen.TopScreen.route,
             onClick = onCards,
             icon = { NavigationIcon(iconUris["card"], "card") },
-            label = if (showLabels) { { Text("カード") } } else null,
+            label = if (showLabels) { { Text("Thẻ") } } else null,
             alwaysShowLabel = showLabels
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Stats.route,
             onClick = onStats,
             icon = { NavigationIcon(iconUris["stats"], "stats") },
-            label = if (showLabels) { { Text("統計") } } else null,
+            label = if (showLabels) { { Text("Thống kê") } } else null,
             alwaysShowLabel = showLabels
         )
         NavigationBarItem(
             selected = currentRoute == Screen.Settings.route,
             onClick = onSettings,
             icon = { NavigationIcon(iconUris["settings"], "settings") },
-            label = if (showLabels) { { Text("設定") } } else null,
+            label = if (showLabels) { { Text("Cài đặt") } } else null,
             alwaysShowLabel = showLabels
         )
     }

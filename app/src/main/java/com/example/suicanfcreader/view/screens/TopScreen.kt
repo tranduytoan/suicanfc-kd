@@ -226,8 +226,8 @@ fun TopScreen(
         if (showCardBalances.value && summaries.value.size > 1) {
             item {
                 SectionHeader(
-                    title = "カード別残高",
-                    supportingText = "${summaries.value.size}枚"
+                    title = "Số dư theo thẻ",
+                    supportingText = "${summaries.value.size} thẻ"
                 )
             }
             items(summaries.value, key = { it.cardId }) { summary ->
@@ -250,7 +250,7 @@ fun TopScreen(
                     modifier = Modifier.fillMaxWidth(),
                     value = searchQuery.value,
                     onValueChange = topScreenViewModel::setSearchQuery,
-                    label = { Text("履歴検索・フィルタ") },
+                    label = { Text("Tìm kiếm & Bộ lọc") },
                     singleLine = true
                 )
             }
@@ -259,8 +259,8 @@ fun TopScreen(
         if (showHistoryHeader.value) {
             item {
                 SectionHeader(
-                    title = "選択中カードの履歴",
-                    supportingText = "${selectedHistory.value.size}件"
+                    title = "Lịch sử thẻ đang chọn",
+                    supportingText = "${selectedHistory.value.size} mục"
                 )
             }
         }
@@ -354,12 +354,12 @@ private fun CardSelector(
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         SectionHeader(
-            title = "カード",
-            supportingText = if (summaries.isEmpty()) "未登録" else "${summaries.size}枚"
+            title = "Thẻ",
+            supportingText = if (summaries.isEmpty()) "Chưa có thẻ" else "${summaries.size} thẻ"
         )
         if (summaries.isEmpty()) {
             Text(
-                text = "交通系ICカードをかざすとカードごとに履歴と残高を保存します。",
+                text = "Chạm thẻ IC giao thông để lưu lịch sử và số dư theo từng thẻ.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -599,7 +599,7 @@ private fun BalanceSummary(
                         ) {
                             Text(
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                text = if (hasFreshData) "このカードを読み取りました" else "交通系ICカードをかざしてください",
+                                text = if (hasFreshData) "Đã đọc thẻ này thành công" else "Vui lòng chạm thẻ IC giao thông",
                                 color = Color(0xFFE8FFF8),
                                 style = MaterialTheme.typography.bodyMedium
                             )
@@ -621,7 +621,7 @@ private fun BalanceSummary(
                     )
                     if (showBalanceDate) {
                         Text(
-                            text = summary?.latestRecord?.date ?: "履歴はまだありません",
+                            text = summary?.latestRecord?.date ?: "Chưa có lịch sử giao dịch",
                             color = Color(0xFFC2E8DE),
                             style = MaterialTheme.typography.bodyMedium
                         )
@@ -667,7 +667,7 @@ private fun CardActionArea(
                     enabled = enabled,
                     shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("統計")
+                    Text("Thống kê")
                 }
             }
         }
@@ -725,7 +725,7 @@ private fun CardBalanceRow(
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "${summary.recordCount}件 / ${summary.latestRecord.date ?: "-"}",
+                        text = "${summary.recordCount} mục / ${summary.latestRecord.date ?: "-"}",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -760,7 +760,7 @@ private fun ExportMenuButton(
         enabled = enabled,
         shape = RoundedCornerShape(8.dp)
     ) {
-        Text("エクスポート")
+        Text("Xuất dữ liệu")
     }
     DropdownMenu(
         expanded = expanded,
@@ -945,12 +945,12 @@ private fun DateHeader(text: String) {
 @Composable
 private fun GatePassageTimeLine(card: TransitHistoryRecord) {
     val times = buildList {
-        card.inGatePassageTime?.let { add("入場 $it") }
-        card.outGatePassageTime?.let { add("出場 $it") }
+        card.inGatePassageTime?.let { add("Vào $it") }
+        card.outGatePassageTime?.let { add("Ra $it") }
     }
     if (times.isEmpty()) return
     Text(
-        text = "改札時刻  ${times.joinToString(" / ")}",
+        text = "Giờ qua cổng  ${times.joinToString(" / ")}",
         color = MaterialTheme.colorScheme.primary,
         style = MaterialTheme.typography.bodySmall,
         fontWeight = FontWeight.Medium
@@ -976,8 +976,8 @@ private fun ModernHistoryItem(
         card.hasInPlace() || card.hasOutPlace() -> listOf(card.inStation, card.outStation)
             .mapNotNull { it.firstReadableOrNull() }
             .joinToString("  ->  ")
-            .ifBlank { card.action ?: card.kind ?: "利用" }
-        else -> card.action ?: card.kind ?: "利用"
+            .ifBlank { card.action ?: card.kind ?: "Sử dụng" }
+        else -> card.action ?: card.kind ?: "Sử dụng"
     }
     val secondary = if (special) {
         listOf(card.activityCompany(), card.activityLine()).mapNotNull { it.firstReadableOrNull() }.joinToString(" / ")
@@ -986,7 +986,7 @@ private fun ModernHistoryItem(
             .mapNotNull { it.firstReadableOrNull() }
             .distinct()
             .joinToString(" / ")
-    }.ifBlank { card.device ?: "交通系IC" }
+    }.ifBlank { card.device ?: "Thẻ IC giao thông" }
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -1049,7 +1049,7 @@ private fun ModernHistoryItem(
                             overflow = TextOverflow.Ellipsis
                         )
                     }
-                    TextButton(onClick = onEdit) { Text("修正") }
+                    TextButton(onClick = onEdit) { Text("Sửa") }
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
@@ -1076,8 +1076,8 @@ private fun ModernHistoryItem(
 private fun HistoryRecordIcon(card: TransitHistoryRecord, color: Color) {
     when {
         card.isBusActivity() -> BusIcon(color)
-        card.activityLabel() == "物販" -> CashRegisterIcon(color)
-        card.activityLabel() == "チャージ" -> Text(
+        card.activityLabel() == "Mua sắm" || card.activityLabel() == "物販" -> CashRegisterIcon(color)
+        card.activityLabel() == "Nạp tiền" || card.activityLabel() == "チャージ" -> Text(
             text = "+",
             color = color,
             style = MaterialTheme.typography.titleMedium,
@@ -1165,7 +1165,7 @@ private fun HistoryCard(
                                 HistoryRecordIcon(card = card, color = MaterialTheme.colorScheme.onSurface)
                             }
                             Text(
-                                text = card.action ?: card.kind ?: "利用履歴",
+                                text = card.action ?: card.kind ?: "Lịch sử sử dụng",
                                 color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.SemiBold,
@@ -1207,7 +1207,7 @@ private fun HistoryCard(
                         onClick = {},
                         label = {
                             Text(
-                                text = card.device ?: "端末不明",
+                                text = card.device ?: "Thiết bị không xác định",
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -1234,13 +1234,13 @@ private fun HistoryCard(
                     ActivityLine(card = card)
                 } else if (card.isBusActivity()) {
                     RouteLine(
-                        label = "入",
+                        label = "Vào",
                         company = card.inCompany,
                         line = card.inLine,
                         station = card.inStation
                     )
                     RouteLine(
-                        label = "出",
+                        label = "Ra",
                         company = card.outCompany,
                         line = card.outLine,
                         station = card.outStation
@@ -1248,7 +1248,7 @@ private fun HistoryCard(
                 } else if (hasInPlace || hasOutPlace) {
                     if (hasInPlace) {
                         RouteLine(
-                            label = "入",
+                            label = "Vào",
                             company = card.inCompany,
                             line = card.inLine,
                             station = card.inStation
@@ -1256,7 +1256,7 @@ private fun HistoryCard(
                     }
                     if (hasOutPlace) {
                         RouteLine(
-                            label = "出",
+                            label = "Ra",
                             company = card.outCompany,
                             line = card.outLine,
                             station = card.outStation
@@ -1280,7 +1280,7 @@ private fun HistoryCard(
                     )
                 }
                 TextButton(onClick = onEdit) {
-                    Text(if (card.manuallyEdited) "修正済み・再編集" else "手動修正")
+                    Text(if (card.manuallyEdited) "Đã sửa / Chỉnh sửa lại" else "Chỉnh sửa thủ công")
                 }
             }
         }
@@ -1291,7 +1291,7 @@ private fun HistoryCard(
 private fun ActivityLine(card: TransitHistoryRecord) {
     val label = card.activityLabel()
     val place = card.activityPlace()
-    val title = if (place != null && (label == "チャージ" || label == "物販")) {
+    val title = if (place != null && (label == "Nạp tiền" || label == "Mua sắm" || label == "チャージ" || label == "物販")) {
         "$label ($place)"
     } else {
         label
@@ -1305,13 +1305,13 @@ private fun ActivityLine(card: TransitHistoryRecord) {
             modifier = Modifier.size(28.dp),
             shape = CircleShape,
             color = when (label) {
-                "チャージ" -> Color(0xFFDDF7EF)
-                "物販" -> Color(0xFFFFE8B7)
+                "Nạp tiền", "チャージ" -> Color(0xFFDDF7EF)
+                "Mua sắm", "物販" -> Color(0xFFFFE8B7)
                 else -> MaterialTheme.colorScheme.surfaceVariant
             }
         ) {
             Box(contentAlignment = Alignment.Center) {
-                if (label == "物販") {
+                if (label == "Mua sắm" || label == "物販") {
                     CashRegisterIcon(Color(0xFF203238))
                 } else {
                     Text(
@@ -1338,7 +1338,7 @@ private fun ActivityLine(card: TransitHistoryRecord) {
                     .mapNotNull { it.firstReadableOrNull() }
                     .distinct()
                     .joinToString(" / ")
-                    .ifBlank { "交通系IC" },
+                    .ifBlank { "Thẻ IC giao thông" },
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
@@ -1358,7 +1358,7 @@ private fun RouteLine(label: String, company: String?, line: String?, station: S
         Surface(
             modifier = Modifier.size(28.dp),
             shape = CircleShape,
-            color = if (label == "入") Color(0xFFDEEEF5) else Color(0xFFFFE4D6)
+            color = if (label == "Vào" || label == "入") Color(0xFFDEEEF5) else Color(0xFFFFE4D6)
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Text(
@@ -1373,7 +1373,7 @@ private fun RouteLine(label: String, company: String?, line: String?, station: S
             val primary = station.firstReadableOrNull()
                 ?: line.firstReadableOrNull()
                 ?: company.firstReadableOrNull()
-                ?: "未記録"
+                ?: "Chưa ghi nhận"
             val secondary = listOf(company, line)
                 .mapNotNull { it.firstReadableOrNull() }
                 .distinct()
@@ -1387,7 +1387,7 @@ private fun RouteLine(label: String, company: String?, line: String?, station: S
                 overflow = TextOverflow.Ellipsis
             )
             Text(
-                text = secondary.ifBlank { "交通系IC" },
+                text = secondary.ifBlank { "Thẻ IC giao thông" },
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
@@ -1412,13 +1412,13 @@ private fun EmptyHistoryCard(transparent: Boolean) {
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
-                text = "このカードの履歴はまだありません",
+                text = "Lịch sử thẻ này hiện đang trống",
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = "交通系ICカードをかざすとカード別に保存されます。",
+                text = "Chạm thẻ IC giao thông để lưu lịch sử và số dư theo từng thẻ.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -1435,20 +1435,20 @@ private fun AliasDialog(
     var alias by remember(summary.cardId) { mutableStateOf(summary.title) }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("カード名を編集") },
+        title = { Text("Đổi tên thẻ") },
         text = {
             OutlinedTextField(
                 value = alias,
                 onValueChange = { alias = it },
-                label = { Text("愛称") },
+                label = { Text("Tên gọi gợi nhớ") },
                 singleLine = true
             )
         },
         confirmButton = {
-            TextButton(onClick = { onSave(alias) }) { Text("保存") }
+            TextButton(onClick = { onSave(alias) }) { Text("Lưu") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("キャンセル") }
+            TextButton(onClick = onDismiss) { Text("Hủy") }
         }
     )
 }
@@ -1474,21 +1474,21 @@ private fun EditHistoryDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("履歴を手動修正") },
+        title = { Text("Chỉnh sửa lịch sử thủ công") },
         text = {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                item { EditField("タイトル", title) { title = it } }
-                item { EditField("日付", date) { date = it } }
-                item { EditField("差額（+/-）", amount) { amount = it } }
-                item { EditField("残高", balance) { balance = it } }
-                item { EditField("入場会社・店舗種別", inCompany) { inCompany = it } }
-                item { EditField("入場路線・分類", inLine) { inLine = it } }
-                item { EditField("入場駅・店舗", inStation) { inStation = it } }
-                item { EditField("出場会社・店舗種別", outCompany) { outCompany = it } }
-                item { EditField("出場路線・分類", outLine) { outLine = it } }
-                item { EditField("出場駅・店舗", outStation) { outStation = it } }
-                item { EditField("メモ", memo) { memo = it } }
-                item { EditField("タグ", tags) { tags = it } }
+                item { EditField("Tiêu đề", title) { title = it } }
+                item { EditField("Ngày", date) { date = it } }
+                item { EditField("Chênh lệch (+/-)", amount) { amount = it } }
+                item { EditField("Số dư", balance) { balance = it } }
+                item { EditField("Hãng/Loại điểm vào", inCompany) { inCompany = it } }
+                item { EditField("Tuyến/Phân loại điểm vào", inLine) { inLine = it } }
+                item { EditField("Ga/Cửa hàng điểm vào", inStation) { inStation = it } }
+                item { EditField("Hãng/Loại điểm ra", outCompany) { outCompany = it } }
+                item { EditField("Tuyến/Phân loại điểm ra", outLine) { outLine = it } }
+                item { EditField("Ga/Cửa hàng điểm ra", outStation) { outStation = it } }
+                item { EditField("Ghi chú", memo) { memo = it } }
+                item { EditField("Thẻ tag", tags) { tags = it } }
             }
         },
         confirmButton = {
@@ -1513,11 +1513,11 @@ private fun EditHistoryDialog(
                     )
                 }
             ) {
-                Text("保存")
+                Text("Lưu")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("キャンセル") }
+            TextButton(onClick = onDismiss) { Text("Hủy") }
         }
     )
 }
@@ -1547,7 +1547,7 @@ private fun SearchDialog(
         containerColor = MaterialTheme.colorScheme.background,
         titleContentColor = MaterialTheme.colorScheme.onBackground,
         textContentColor = MaterialTheme.colorScheme.onBackground,
-        title = { Text("履歴検索") },
+        title = { Text("Tìm kiếm lịch sử") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
@@ -1557,18 +1557,18 @@ private fun SearchDialog(
                         localQuery = it
                         onQueryChange(it)
                     },
-                    label = { Text("履歴検索・フィルタ") },
+                    label = { Text("Tìm kiếm & Bộ lọc") },
                     singleLine = true
                 )
                 Text(
-                    text = if (localQuery.isBlank()) "検索語を入力してください" else "${resultCount}件",
+                    text = if (localQuery.isBlank()) "Nhập từ khóa tìm kiếm" else "${resultCount} kết quả",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("閉じる") }
+            TextButton(onClick = onDismiss) { Text("Đóng") }
         },
         dismissButton = {
             TextButton(
@@ -1576,7 +1576,7 @@ private fun SearchDialog(
                     localQuery = ""
                     onQueryChange("")
                 }
-            ) { Text("クリア") }
+            ) { Text("Xóa") }
         }
     )
 }
@@ -1593,14 +1593,14 @@ private fun TextDialog(
         title = { Text(title) },
         text = {
             SelectionContainer {
-                Text(text = text.ifBlank { "データがありません" })
+                Text(text = text.ifBlank { "Không có dữ liệu" })
             }
         },
         confirmButton = {
-            TextButton(onClick = onCopy) { Text("コピー") }
+            TextButton(onClick = onCopy) { Text("Sao chép") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("閉じる") }
+            TextButton(onClick = onDismiss) { Text("Đóng") }
         }
     )
 }
@@ -1617,15 +1617,15 @@ fun StatsScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 20.dp)
     ) {
-        PageHeader(title = "統計", onBack = onBack)
+        PageHeader(title = "Thống kê", onBack = onBack)
         Text(
             modifier = Modifier.padding(top = 16.dp),
-            text = viewModel.statsText().ifBlank { "統計を表示できる履歴がありません" },
+            text = viewModel.statsText().ifBlank { "Chưa có dữ liệu lịch sử để hiển thị thống kê" },
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.bodyLarge
         )
         TextButton(onClick = { clipboardManager.setText(AnnotatedString(viewModel.statsText())) }) {
-            Text("統計をコピー")
+            Text("Sao chép thống kê")
         }
     }
 }
@@ -1759,7 +1759,7 @@ private fun PageHeader(title: String, onBack: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(title, color = MaterialTheme.colorScheme.onBackground, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
-        TextButton(onClick = onBack) { Text("戻る") }
+        TextButton(onClick = onBack) { Text("Quay lại") }
     }
 }
 
@@ -1860,7 +1860,7 @@ private fun SettingsContent(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        PageHeader(title = "設定", onBack = onDismiss)
+        PageHeader(title = "Cài đặt", onBack = onDismiss)
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -1869,118 +1869,118 @@ private fun SettingsContent(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
                 item {
-                    EditField("アプリ名", title) { title = it }
+                    EditField("Tên ứng dụng", title) { title = it }
                 }
                 item {
                     Button(
                         onClick = {
                             onAppTitleSave(title)
-                            message = "アプリ名を保存しました"
+                            message = "Đã lưu tên ứng dụng"
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("アプリ名を保存")
+                        Text("Lưu tên ứng dụng")
                     }
                 }
                 item {
-                    EditField("アクセントカラー (#RRGGBB)", accent) { accent = it }
+                    EditField("Màu chủ đạo (#RRGGBB)", accent) { accent = it }
                 }
                 item {
                     Button(
                         onClick = {
                             onAccentSave(accent)
-                            message = "アクセントカラーを保存しました"
+                            message = "Đã lưu màu chủ đạo"
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("アクセントカラーを保存")
+                        Text("Lưu màu chủ đạo")
                     }
                 }
                 item {
-                    EditField("残高表示カラー (#RRGGBB)", balanceColor) { balanceColor = it }
+                    EditField("Màu hiển thị số dư (#RRGGBB)", balanceColor) { balanceColor = it }
                 }
                 item {
                     Button(
                         onClick = {
                             onBalanceColorSave(balanceColor)
-                            message = "残高表示カラーを保存しました"
+                            message = "Đã lưu màu hiển thị số dư"
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("残高表示カラーを保存")
+                        Text("Lưu màu hiển thị số dư")
                     }
                 }
                 item {
-                    EditField("カードヘッダー背景カラー (#RRGGBB)", summaryBackgroundColor) { summaryBackgroundColor = it }
+                    EditField("Màu nền thông tin thẻ (#RRGGBB)", summaryBackgroundColor) { summaryBackgroundColor = it }
                 }
                 item {
                     Button(
                         onClick = {
                             onSummaryBackgroundColorSave(summaryBackgroundColor)
-                            message = "カードヘッダー背景カラーを保存しました"
+                            message = "Đã lưu màu nền thông tin thẻ"
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("カードヘッダー背景カラーを保存")
+                        Text("Lưu màu nền thông tin thẻ")
                     }
                 }
                 item {
-                    EditField("残高エリア背景カラー (#RRGGBB)", balanceBackgroundColor) { balanceBackgroundColor = it }
+                    EditField("Màu nền khu vực số dư (#RRGGBB)", balanceBackgroundColor) { balanceBackgroundColor = it }
                 }
                 item {
                     Button(
                         onClick = {
                             onBalanceBackgroundColorSave(balanceBackgroundColor)
-                            message = "残高エリア背景カラーを保存しました"
+                            message = "Đã lưu màu nền khu vực số dư"
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("残高エリア背景カラーを保存")
+                        Text("Lưu màu nền khu vực số dư")
                     }
                 }
                 item {
-                    EditField("選択外カード背景カラー (#RRGGBB)", otherCardBackgroundColor) { otherCardBackgroundColor = it }
+                    EditField("Màu nền thẻ không chọn (#RRGGBB)", otherCardBackgroundColor) { otherCardBackgroundColor = it }
                 }
                 item {
                     Button(
                         onClick = {
                             onOtherCardBackgroundColorSave(otherCardBackgroundColor)
-                            message = "選択外カード背景カラーを保存しました"
+                            message = "Đã lưu màu nền thẻ không chọn"
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("選択外カード背景カラーを保存")
+                        Text("Lưu màu nền thẻ không chọn")
                     }
                 }
                 item {
-                    EditField("ウィジェット背景カラー (#RRGGBB)", widgetBackgroundColor) { widgetBackgroundColor = it }
+                    EditField("Màu nền Widget (#RRGGBB)", widgetBackgroundColor) { widgetBackgroundColor = it }
                 }
                 item {
                     Button(
                         onClick = {
                             onWidgetBackgroundColorSave(widgetBackgroundColor)
-                            message = "ウィジェット背景カラーを保存しました"
+                            message = "Đã lưu màu nền Widget"
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("ウィジェット背景カラーを保存")
+                        Text("Lưu màu nền Widget")
                     }
                 }
                 item {
                     Button(onClick = onPickWidgetBackgroundImage, shape = RoundedCornerShape(8.dp)) {
-                        Text("ウィジェット背景画像を選択")
+                        Text("Chọn ảnh nền Widget")
                     }
                 }
                 item {
                     FeatureFlagRow(
-                        label = "ウィジェットに残高・履歴を表示",
+                        label = "Hiển thị số dư & lịch sử trên Widget",
                         checked = !widgetPrivacyMode,
                         onCheckedChange = { onWidgetPrivacyModeChanged(!it) }
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "残高・履歴エリアを透明にする",
+                        label = "Làm trong suốt khu vực số dư & lịch sử",
                         checked = transparentContentSurfaces,
                         onCheckedChange = onTransparentContentSurfacesChanged
                     )
@@ -1988,43 +1988,43 @@ private fun SettingsContent(
                 if (widgetBackgroundImageUri != null) {
                     item {
                         OutlinedButton(onClick = onClearWidgetBackgroundImage, shape = RoundedCornerShape(8.dp)) {
-                            Text("ウィジェット背景画像を解除")
+                            Text("Gỡ ảnh nền Widget")
                         }
                     }
                 }
                 item {
                     Button(onClick = onPickThemeBackgroundImage, shape = RoundedCornerShape(8.dp)) {
-                        Text("アプリ背景画像を選択")
+                        Text("Chọn ảnh nền ứng dụng")
                     }
                 }
                 if (themeBackgroundImageUri != null) {
                     item {
                         OutlinedButton(onClick = onClearThemeBackgroundImage, shape = RoundedCornerShape(8.dp)) {
-                            Text("アプリ背景画像を解除")
+                            Text("Gỡ ảnh nền ứng dụng")
                         }
                     }
                 }
                 item {
                     Column {
-                        Text("背景画像の暗さ: ${themeBackgroundDimAmount}%")
+                        Text("Độ tối ảnh nền: ${themeBackgroundDimAmount}%")
                         Slider(
                             value = themeBackgroundDimAmount.toFloat(),
                             onValueChange = { onThemeBackgroundDimAmountChanged(it.toInt()) },
                             valueRange = 0f..100f
                         )
-                        Text("0% にすると背景画像を暗くせず表示します", style = MaterialTheme.typography.bodySmall)
+                        Text("0%: Giữ nguyên độ sáng ảnh nền", style = MaterialTheme.typography.bodySmall)
                     }
                 }
-                item { Text("下部タブのアイコン", style = MaterialTheme.typography.titleMedium) }
-                listOf("card" to "カード", "stats" to "統計", "settings" to "設定").forEach { (kind, label) ->
+                item { Text("Biểu tượng tab điều hướng", style = MaterialTheme.typography.titleMedium) }
+                listOf("card" to "Thẻ", "stats" to "Thống kê", "settings" to "Cài đặt").forEach { (kind, label) ->
                     item {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Button(onClick = { onPickBottomTabIcon(kind) }, shape = RoundedCornerShape(8.dp)) {
-                                Text("$label アイコンを選択")
+                                Text("Chọn biểu tượng $label")
                             }
                             if (bottomTabIconUris[kind] != null) {
                                 OutlinedButton(onClick = { onClearBottomTabIcon(kind, null) }, shape = RoundedCornerShape(8.dp)) {
-                                    Text("解除")
+                                    Text("Gỡ bỏ")
                                 }
                             }
                         }
@@ -2032,157 +2032,157 @@ private fun SettingsContent(
                 }
                 item {
                     Button(onClick = onPickSummaryBackgroundImage, shape = RoundedCornerShape(8.dp)) {
-                        Text("選択中カードの残高背景画像を選択")
+                        Text("Chọn ảnh nền thẻ đang chọn")
                     }
                 }
                 if (summaryBackgroundImageUri != null) {
                     item {
                         OutlinedButton(onClick = onClearSummaryBackgroundImage, shape = RoundedCornerShape(8.dp)) {
-                            Text("選択中カードの残高背景画像を解除")
+                            Text("Gỡ ảnh nền thẻ đang chọn")
                         }
                     }
                 }
                 item {
                     OutlinedButton(onClick = onClearAllBackgroundImages, shape = RoundedCornerShape(8.dp)) {
-                        Text("すべての背景画像を解除")
+                        Text("Gỡ toàn bộ ảnh nền")
                     }
                 }
                 item {
-                    EditField("読み取り案内背景カラー (#RRGGBB)", noticeBackgroundColor) { noticeBackgroundColor = it }
+                    EditField("Màu nền thông báo quét thẻ (#RRGGBB)", noticeBackgroundColor) { noticeBackgroundColor = it }
                 }
                 item {
                     Button(
                         onClick = {
                             onNoticeBackgroundColorSave(noticeBackgroundColor)
-                            message = "読み取り案内背景カラーを保存しました"
+                            message = "Đã lưu màu nền thông báo quét thẻ"
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("読み取り案内背景カラーを保存")
+                        Text("Lưu màu nền thông báo quét thẻ")
                     }
                 }
                 item {
-                    EditField("削除アイコンカラー (#RRGGBB)", deleteButtonColor) { deleteButtonColor = it }
+                    EditField("Màu biểu tượng xóa (#RRGGBB)", deleteButtonColor) { deleteButtonColor = it }
                 }
                 item {
                     Button(
                         onClick = {
                             onDeleteButtonColorSave(deleteButtonColor)
-                            message = "削除アイコンカラーを保存しました"
+                            message = "Đã lưu màu biểu tượng xóa"
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("削除アイコンカラーを保存")
+                        Text("Lưu màu biểu tượng xóa")
                     }
                 }
                 item {
                     FeatureFlagRow(
-                        label = "虫眼鏡アイコン検索を表示",
+                        label = "Hiển thị tìm kiếm biểu tượng kính lúp",
                         checked = useSearchIcon,
                         onCheckedChange = onUseSearchIconChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "従来の履歴検索・フィルタを表示",
+                        label = "Hiển thị thanh tìm kiếm & bộ lọc cũ",
                         checked = showLegacySearchBar,
                         onCheckedChange = onShowLegacySearchBarChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "カード別残高を表示",
+                        label = "Hiển thị số dư theo từng thẻ",
                         checked = showCardBalances,
                         onCheckedChange = onShowCardBalancesChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "モダンUIを使用",
+                        label = "Sử dụng giao diện hiện đại",
                         checked = useModernUi,
                         onCheckedChange = onUseModernUiChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "デモモード（実データを変更しない）",
+                        label = "Chế độ Demo (không thay đổi dữ liệu thật)",
                         checked = demoMode,
                         onCheckedChange = onDemoModeChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "下部タブのラベルを表示",
+                        label = "Hiển thị nhãn tab điều hướng",
                         checked = showBottomTabLabels,
                         onCheckedChange = onShowBottomTabLabelsChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "このカードを削除を表示",
+                        label = "Hiển thị nút xóa thẻ này",
                         checked = showDeleteButton,
                         onCheckedChange = onShowDeleteButtonChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "かざしてください案内を表示",
+                        label = "Hiển thị thông báo chạm thẻ",
                         checked = showReadNotice,
                         onCheckedChange = onShowReadNoticeChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "統計ボタンを表示",
+                        label = "Hiển thị nút thống kê",
                         checked = showStatisticsButton,
                         onCheckedChange = onShowStatisticsButtonChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "パレットアイコンを表示",
+                        label = "Hiển thị biểu tượng bảng màu",
                         checked = showPaletteIcon,
                         onCheckedChange = onShowPaletteIconChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "上部のその他メニューを表示",
+                        label = "Hiển thị menu ba chấm trên cùng",
                         checked = showMoreMenu,
                         onCheckedChange = onShowMoreMenuChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "駅・バス停の内部コードを表示",
+                        label = "Hiển thị mã nội bộ ga & trạm buýt",
                         checked = showInternalCodes,
                         onCheckedChange = onShowInternalCodesChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "履歴の見出しと件数を表示",
+                        label = "Hiển thị tiêu đề và số lượng lịch sử",
                         checked = showHistoryHeader,
                         onCheckedChange = onShowHistoryHeaderChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "残高エリアの日付を表示",
+                        label = "Hiển thị ngày ở khu vực số dư",
                         checked = showBalanceDate,
                         onCheckedChange = onShowBalanceDateChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "履歴の取引後残高を表示",
+                        label = "Hiển thị số dư sau giao dịch trong lịch sử",
                         checked = showHistoryBalances,
                         onCheckedChange = onShowHistoryBalancesChanged
                     )
                 }
                 item {
                     FeatureFlagRow(
-                        label = "履歴の交通・物販・チャージアイコンを表示",
+                        label = "Hiển thị biểu tượng di chuyển, mua sắm, nạp tiền",
                         checked = showHistoryIcons,
                         onCheckedChange = onShowHistoryIconsChanged
                     )
@@ -2190,12 +2190,12 @@ private fun SettingsContent(
                 item {
                     Column {
                         FeatureFlagRow(
-                            label = "改札通過時刻を表示",
+                            label = "Hiển thị giờ qua cổng soát vé",
                             checked = showGatePassageTime,
                             onCheckedChange = onShowGatePassageTimeChanged
                         )
                         Text(
-                            text = "対応カードから改札ログを追加取得します。読取に失敗しても通常の履歴は表示されます。初期設定はOFFです。",
+                            text = "Lấy thêm nhật ký giờ qua cổng từ các thẻ hỗ trợ. Nếu đọc thất bại, lịch sử thông thường vẫn hiển thị. Mặc định là TẮT.",
                             modifier = Modifier.padding(start = 16.dp, end = 16.dp),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             style = MaterialTheme.typography.bodySmall
@@ -2204,7 +2204,7 @@ private fun SettingsContent(
                 }
                 item {
                     Text(
-                        text = "追加機能はデフォルトで有効です。",
+                        text = "Các tính năng bổ sung được bật theo mặc định.",
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium
                     )
@@ -2220,16 +2220,16 @@ private fun SettingsContent(
                     Button(
                         onClick = {
                             onExportBackup()
-                            message = "保存先を選択してください"
+                            message = "Vui lòng chọn nơi lưu tệp"
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("バックアップをファイルに保存")
+                        Text("Sao lưu dữ liệu ra tệp")
                     }
                 }
                 item {
                     OutlinedButton(onClick = onImportBackupFile, shape = RoundedCornerShape(8.dp)) {
-                        Text("バックアップファイルを読み込む")
+                        Text("Khôi phục từ tệp sao lưu")
                     }
                 }
                 item {
@@ -2237,7 +2237,7 @@ private fun SettingsContent(
                         modifier = Modifier.fillMaxWidth(),
                         value = backupText,
                         onValueChange = { backupText = it },
-                        label = { Text("インポートJSON") },
+                        label = { Text("Chuỗi JSON sao lưu") },
                         minLines = 3
                     )
                 }
@@ -2245,14 +2245,14 @@ private fun SettingsContent(
                     Button(
                         onClick = {
                             message = if (onImportBackup(backupText)) {
-                                "インポートしました"
+                                "Đã khôi phục dữ liệu thành công"
                             } else {
-                                "インポートに失敗しました"
+                                "Khôi phục dữ liệu thất bại"
                             }
                         },
                         shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("インポート")
+                        Text("Nhập dữ liệu")
                     }
                 }
                 if (message.isNotBlank()) {
@@ -2290,13 +2290,13 @@ private fun FeatureFlagRow(
 
 private fun String.featureLabel(): String =
     when (this) {
-        "manual_edit" -> "手動修正"
-        "memo_tags" -> "メモ・タグ"
-        "search_filter" -> "履歴検索・フィルタ"
-        "statistics" -> "統計"
-        "exports" -> "CSV/JSON/Notionエクスポート"
-        "widget" -> "ウィジェット"
-        "card_alias" -> "カード名編集"
+        "manual_edit" -> "Chỉnh sửa thủ công"
+        "memo_tags" -> "Ghi chú & Thẻ tag"
+        "search_filter" -> "Tìm kiếm & Bộ lọc"
+        "statistics" -> "Thống kê"
+        "exports" -> "Xuất CSV / JSON / Notion"
+        "widget" -> "Widget"
+        "card_alias" -> "Đổi tên thẻ"
         else -> this
     }
 
@@ -2333,28 +2333,28 @@ private fun TransitHistoryRecord.hasOutPlace(): Boolean =
 private fun TransitHistoryRecord.activityLabel(): String {
     val text = listOf(action, kind, device).joinToString(" ")
     return when {
-        "チャージ" in text || (amount?.toIntOrNull() ?: 0) > 0 -> "チャージ"
-        "物販" in text -> "物販"
-        "バス" in text -> "バス"
-        else -> action ?: kind ?: "利用"
+        "チャージ" in text || "Nạp tiền" in text || (amount?.toIntOrNull() ?: 0) > 0 -> "Nạp tiền"
+        "物販" in text || "Mua sắm" in text -> "Mua sắm"
+        "バス" in text || "Xe buýt" in text -> "Xe buýt"
+        else -> action ?: kind ?: "Sử dụng"
     }
 }
 
 private fun TransitHistoryRecord.activityBadge(): String =
     when (activityLabel()) {
-        "チャージ" -> "+"
-        "物販" -> "POS"
+        "Nạp tiền", "チャージ" -> "+"
+        "Mua sắm", "物販" -> "POS"
         else -> "IC"
     }
 
 private fun TransitHistoryRecord.isSpecialActivity(): Boolean {
     val text = listOf(action, kind).joinToString(" ")
-    return "チャージ" in text || "物販" in text
+    return "チャージ" in text || "物販" in text || "Nạp tiền" in text || "Mua sắm" in text
 }
 
 private fun TransitHistoryRecord.isBusActivity(): Boolean {
     val text = listOf(action, kind, device).joinToString(" ")
-    return "バス" in text
+    return "バス" in text || "Xe buýt" in text
 }
 
 private fun TransitHistoryRecord.activityPlace(): String? =
@@ -2372,16 +2372,16 @@ private fun TransitHistoryRecord.activityLine(): String? =
     inLine.firstReadableOrNull() ?: outLine.firstReadableOrNull()
 
 private fun String?.firstReadableOrNull(): String? {
-    return this?.takeIf { it.isNotBlank() && it != "-" && it != "未記録" }
+    return this?.takeIf { it.isNotBlank() && it != "-" && it != "未記録" && it != "Chưa ghi nhận" }
 }
 
 private fun String.toJapaneseDateLabel(): String {
     val parts = split("/")
-    if (parts.size != 3) return ifBlank { "日付なし" }
+    if (parts.size != 3) return ifBlank { "Chưa có ngày" }
     val year = parts[0].toIntOrNull() ?: return this
     val month = parts[1].toIntOrNull() ?: return this
     val day = parts[2].toIntOrNull() ?: return this
-    return String.format(Locale.JAPAN, "%d年%d月%d日", year, month, day)
+    return String.format(Locale.US, "%02d/%02d/%04d", day, month, year)
 }
 
 @Composable
